@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { TopNav } from "./TopNav";
 import { Headline } from "./Headline";
@@ -30,8 +30,12 @@ const importLanyard = (retries = 2): Promise<typeof import("@/components/lanyard
     throw err;
   });
 
-const lanyardModulePromise = importLanyard();
-const Lanyard = lazy(() => lanyardModulePromise);
+// O módulo do Lanyard (Three.js + .glb, ~5 MB) NÃO é baixado no carregamento
+// do módulo. Ele é aquecido só depois da primeira pintura (ver useEffect
+// abaixo) ou quando o <Lanyard> monta de fato, pra não pesar no caminho crítico.
+let lanyardModulePromise: ReturnType<typeof importLanyard> | null = null;
+const loadLanyard = () => (lanyardModulePromise ??= importLanyard());
+const Lanyard = lazy(loadLanyard);
 
 function LanyardFallback() {
   return (
@@ -56,6 +60,28 @@ export const SplashScreen = ({ scrollYProgress }: SplashScreenProps) => {
   const scrollTextOpacity = useTransform(scrollY, [0, 80], [0.5, 0]);
   const scrollTextY = useTransform(scrollY, [0, 80], [0, 12]);
   const started = useLoaderStarted();
+
+  // Aquece o módulo 3D depois que a tela já pintou, deixando-o pronto antes de
+  // o crachá montar, sem competir com os recursos do carregamento inicial.
+  useEffect(() => {
+    const ric = (window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    }).requestIdleCallback;
+    let idleId: number | undefined;
+    let timerId: number | undefined;
+    if (ric) {
+      idleId = ric(() => void loadLanyard(), { timeout: 1500 });
+    } else {
+      timerId = window.setTimeout(() => void loadLanyard(), 600);
+    }
+    return () => {
+      const cic = (window as unknown as {
+        cancelIdleCallback?: (id: number) => void;
+      }).cancelIdleCallback;
+      if (idleId !== undefined && cic) cic(idleId);
+      if (timerId !== undefined) window.clearTimeout(timerId);
+    };
+  }, []);
 
   return (
     <section

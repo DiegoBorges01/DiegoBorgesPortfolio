@@ -8,16 +8,6 @@ export default function ContactSection() {
     const iframeSrc =
       "https://forms.visme.co/formsPlayer/_embed/q74pzeyw-untitled-project?embedIframeId=1";
 
-    const preloadId = "visme-contact-preload";
-    if (!document.getElementById(preloadId)) {
-      const preload = document.createElement("link");
-      preload.id = preloadId;
-      preload.rel = "prefetch";
-      preload.href = iframeSrc;
-      preload.crossOrigin = "anonymous";
-      document.head.appendChild(preload);
-    }
-
     const section = sectionRef.current;
     const reactHost = mountRef.current;
     if (!section || !reactHost) return;
@@ -49,26 +39,14 @@ export default function ContactSection() {
       host.appendChild(iframe);
     };
 
-    // 1) CARREGA cedo, em segundo plano, assim que o navegador fica ocioso.
-    //    A seção fica escondida (opacity 0 via CSS), então a tela branca da
-    //    Visme acontece fora da vista do usuário.
-    const ric = (window as unknown as {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-    }).requestIdleCallback;
-    let idleId: number | undefined;
-    let timerId: number | undefined;
-    if (ric) {
-      idleId = ric(inject, { timeout: 2500 });
-    } else {
-      timerId = window.setTimeout(inject, 1200);
-    }
-
-    // 2) ATIVA a revelação só quando a seção entra na viewport.
+    // Carrega o iframe da Visme só quando a seção de contato se aproxima da
+    // viewport (400px de antecedência). Assim esse iframe de terceiro não pesa
+    // no carregamento inicial da página, e a margem evita o flash branco.
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            inject(); // garante o iframe mesmo se o idle ainda não rodou
+            inject();
             reactHost.classList.add("is-active");
             io.disconnect();
             break;
@@ -81,11 +59,6 @@ export default function ContactSection() {
 
     return () => {
       io.disconnect();
-      const cic = (window as unknown as {
-        cancelIdleCallback?: (id: number) => void;
-      }).cancelIdleCallback;
-      if (idleId !== undefined && cic) cic(idleId);
-      if (timerId !== undefined) window.clearTimeout(timerId);
       if (host.parentNode === reactHost) reactHost.removeChild(host);
     };
   }, []);
