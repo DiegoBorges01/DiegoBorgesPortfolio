@@ -310,7 +310,7 @@ export default function Projects() {
     if (section) {
       const rect = section.getBoundingClientRect();
       const fully = isMobileRef.current
-        ? rect.top <= 5 && rect.bottom >= window.innerHeight - 5 && rect.width >= window.innerWidth - 5
+        ? rect.top <= 64 && rect.bottom >= window.innerHeight - 64 && rect.width >= window.innerWidth * 0.85
         : isSectionViewportAligned(section) && isProjectsSliderReady();
       if (!fully) return;
     }
@@ -555,7 +555,7 @@ export default function Projects() {
     const check = () => {
       const rect = section.getBoundingClientRect();
       const fully = isMobileRef.current
-        ? rect.top <= 5 && rect.bottom >= window.innerHeight - 5 && rect.width >= window.innerWidth - 5
+        ? rect.top <= 64 && rect.bottom >= window.innerHeight - 64 && rect.width >= window.innerWidth * 0.85
         : isSectionViewportAligned(section) && isProjectsSliderReady();
       if (fully && !visible) {
         visible = true;
@@ -656,7 +656,7 @@ export default function Projects() {
     const onWheel = (e: WheelEvent) => {
       const rect = section.getBoundingClientRect();
       const fully = isMobileRef.current
-        ? rect.top <= 5 && rect.bottom >= window.innerHeight - 5 && rect.width >= window.innerWidth - 5
+        ? rect.top <= 64 && rect.bottom >= window.innerHeight - 64 && rect.width >= window.innerWidth * 0.85
         : isSectionViewportAligned(section) && isProjectsSliderReady();
       if (!fully) {
         unlock();
@@ -705,9 +705,9 @@ export default function Projects() {
     const isFullyVisibleMobile = () => {
       const rect = section.getBoundingClientRect();
       return (
-        rect.top <= 5 &&
-        rect.bottom >= window.innerHeight - 5 &&
-        rect.width >= window.innerWidth - 5
+        rect.top <= 64 &&
+        rect.bottom >= window.innerHeight - 64 &&
+        rect.width >= window.innerWidth * 0.85
       );
     };
 
