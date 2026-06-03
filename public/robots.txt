@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://dborgesportfolio.lovable.app/sitemap.xml
+Sitemap: https://diego-borges-portfolio.vercel.app/sitemap.xml
