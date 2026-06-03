@@ -1,5 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,6 +37,7 @@ const App = () => {
 
   return (
     <TooltipProvider>
+      <SpeedInsights />
       <Toaster />
       <Sonner />
       <LoaderGateProvider started={loaderDone}>
