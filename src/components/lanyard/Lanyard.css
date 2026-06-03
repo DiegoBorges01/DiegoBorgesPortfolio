@@ -1,0 +1,33 @@
+.lanyard-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.lanyard-wrapper canvas {
+  pointer-events: auto;
+}
+
+/* On mobile the card's resting position is biased to the upper area via
+   the physics anchor (see Lanyard.tsx: group position [0,4,0] + anchorX=0
+   + camera pulled back). The wrapper itself must cover the full splash
+   so the 3D canvas can render the card anywhere the user drags it —
+   constraining the wrapper height (e.g. 48vh) clips the canvas and the
+   card disappears when dragged near/over the headline.
+   Desktop is untouched (rules apply only below 768px). */
+@media (max-width: 767px) {
+  .lanyard-wrapper {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    z-index: 15;
+  }
+
+  .lanyard-wrapper canvas {
+    touch-action: pan-y;
+  }
+}

@@ -1,0 +1,145 @@
+/* LoadingScreen.css — scoped under .ls-* so it never collides with the host app. */
+
+.ls-stage {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: 100vw;
+  background: #FAFAFA;
+  color: #111111;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 9999;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.ls-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+}
+
+.ls-row {
+  display: flex;
+  align-items: center;
+  width: 100vw;
+  max-width: none;
+  padding: 0 4vw;
+  box-sizing: border-box;
+  transition: opacity 0.3s ease;
+  font-weight: 500;
+  font-size: clamp(11px, 0.9vw, 13px);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ls-col {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  gap: 4vw;
+  transition: padding 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+              gap     1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ls-col-left  { justify-content: flex-end;   padding-right: 1.5vw; }
+.ls-col-right { justify-content: flex-start; padding-left:  1.5vw; }
+.ls-row.expand .ls-col-left  { padding-right: 6vw; gap: 22vw; }
+.ls-row.expand .ls-col-right { padding-left:  6vw; gap: 22vw; }
+.ls-row.fade-out { opacity: 0; }
+
+.ls-cell {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+.ls-count .ls-val { font-variant-numeric: tabular-nums; }
+.ls-val { display: inline-block; }
+
+.ls-sq {
+  display: inline-block;
+  margin-right: 0.4em;
+  line-height: 1;
+  font-size: 1em;
+  animation: ls-blink 1s steps(1) infinite;
+}
+.ls-sq.hidden { display: none; animation: none; }
+
+@keyframes ls-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Ink Drop — stylized teardrop bitmap */
+.ls-ink-drop {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  width: 64px;
+  height: 88px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 10000;
+  opacity: 1;
+  transform: translate(-50%, -120px);
+  transition: transform 1s ease-in;
+  will-change: transform;
+  pointer-events: none;
+}
+.ls-ink-drop.fall {
+  transform: translate(-50%, 100dvh);
+}
+
+/* Ink Spread — vmax-based circle anchored bottom-center */
+.ls-ink-spread {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: 150vmax;
+  height: 150vmax;
+  border-radius: 50%;
+  background-color: #111111;
+  transform: translate(-50%, 50%) scale(0);
+  transform-origin: center center;
+  transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 9998;
+  will-change: transform;
+  pointer-events: none;
+}
+.ls-ink-spread.takeover {
+
+  transform: translate(-50%, 50%) scale(1.5);
+}
+
+/* ── Mobile responsiveness ─────────────────────────────────────────
+   Prevents the loading row from colliding/overflowing on narrow screens.
+   Visual style preserved — only sizes/spacing tuned for ≤768px. */
+@media (max-width: 768px) {
+  .ls-row {
+    justify-content: center;
+    gap: 1.25ch;
+    padding: 0 16px;
+    font-size: clamp(7px, 2vw, 9px);
+    letter-spacing: 0.85px;
+    line-height: 1.1;
+  }
+  .ls-col {
+    width: auto;
+    flex: 0 0 auto;
+    gap: 1.25ch;
+  }
+  .ls-col-left  { padding-right: 0; }
+  .ls-col-right { padding-left:  0; }
+  .ls-row.expand .ls-col-left  { padding-right: 2vw; gap: clamp(10px, 5vw, 22px); }
+  .ls-row.expand .ls-col-right { padding-left:  2vw; gap: clamp(10px, 5vw, 22px); }
+}
+
